@@ -135,8 +135,31 @@ std::vector<T> top_k(const std::vector<T>& items, std::size_t k, Less less = Les
     //    heap.top() < item.  Read less(a, b) as "a is WORSE than b": the heap
     //    keeps the k best items with the worst of them on top.
     //  * std::reverse (from <algorithm>) flips a vector.
-    (void)items;
-    (void)k;
-    (void)less;
-    return {};
+    if (k == 0) return{};
+    MinHeap<T, Less> best_items(less);
+    std::vector<T> results(0);
+
+    for (std::size_t i = 0; i < items.size(); i++){
+        
+        T val = items[i];                // Get the first value on the items list
+
+        // If there are open slots in the new list, push it on
+        if (best_items.size() < k){
+            best_items.push(val);
+        }
+        // If the list is full compare the first value to the new value being entered
+        else if (less(best_items.top(), val)){
+            best_items.pop();
+            best_items.push(val);       // Put the higher value onto the heap
+        }
+    // Take the items from the heap and store them in the vector results  
+    while(!best_items.empty()){
+        T i = best_items.pop();
+        results.push_back(i);
+    }
+    // Reverse the vector so the values are descending greatest -> least 
+    std::reverse(results.begin(), results.end());
+    return reverse;
 }
+}
+
