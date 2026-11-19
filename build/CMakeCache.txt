@@ -222,7 +222,7 @@ MiniHarness_SOURCE_DIR:STATIC=/home/camdenleibee/Coding/ECE 309/Projects/Final P
 USE_P2_REFERENCE:BOOL=ON
 
 //Build with the instructor's P3 ToolRegistry/Workspace::resolve/calc_evaluate
-USE_P3_REFERENCE:BOOL=OFF
+USE_P3_REFERENCE:BOOL=ON
 
 
 ########################

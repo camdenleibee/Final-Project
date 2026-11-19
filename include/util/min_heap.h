@@ -33,29 +33,37 @@ public:
 
     // Adds value. O(log n).
     void push(T value) {
-        // TODO: append to data_, then sift the new element up.
-        // Clue: compare with less_(a, b), never a < b. Some element types
-        // (e.g. the provided memory_store.cpp's Scored struct) have no
-        // operator<, and a min-heap of std::greater must still work.
-        (void)value;
+        data_.push_back(value);                 // Appends value
+        std::size_t val = data_.size() - 1;     // Gets index
+        data_.sift_up(val);                           // Percolate up to sort
     }
 
     // The smallest element. Throws std::out_of_range if empty. O(1).
     const T& top() const {
-        // TODO
-        throw std::out_of_range("MinHeap::top not implemented");
+        // Error if Heap is empty 
+        if(data_.empty()) throw std::out_of_range("MinHeap::empty Heap");
+        else{
+            std::size_t val = 0;
+            return data_[val];
+        }
+        
     }
 
     // Removes and returns the smallest element. Throws std::out_of_range if
     // empty. O(log n).
     T pop() {
-        // TODO: save the root, move the last element to the root, shrink,
-        // sift down, return the saved root.
-        // Clue: check empty() first. With one element, there is no "last
-        // element" to move: just take it and pop_back().
-        // Clue: T result = std::move(data_[0]); then move the last element
-        // into slot 0 (moving avoids copying big strings).
-        throw std::out_of_range("MinHeap::pop not implemented");
+      
+        if (data_.empty()) throw std::out_of_range("MinHeap::pop called on an empty heap");     // Empty Heap no root node
+
+        T result = std::move(data_[0]);
+        std::size_t val = data_.size() - 1; 
+        if (data_.empty()) {
+            return result;                      // Smallest element is the root and now sifting needs to be done    
+        }
+        data_[0] = data_[val];
+        val = 0;                  // Move last element into root 
+        data_.sift_down(val);
+        
     }
 
     std::size_t size() const noexcept { return data_.size(); }
@@ -63,15 +71,44 @@ public:
     void        clear() noexcept { data_.clear(); }
 
 private:
-    // ===== YOUR HELPERS AND MEMBERS =====
-    // Children of index i are 2i+1 and 2i+2; its parent is (i-1)/2.
-    // Suggested: void sift_up(std::size_t i);  void sift_down(std::size_t i);
-    // Clue: use std::size_t (not int) for indices, or -Wsign-compare warns
-    // every time you compare with data_.size(). Careful: (i-1)/2 with i == 0
-    // underflows, so sift_up must stop at i == 0.
-    // Clue: in sift_down, the right child may not exist: check
-    // 2*i+2 < data_.size() before reading it. Swap with the SMALLER child.
+    // =====  HELPERS AND MEMBERS ====
 
+    // Helper function that Sifts/Percolates Up 
+    void sift_up(std::size_t i){
+        if (i == 0) return;                         // If index is the root return immediately
+        while (i > 0){                              // Percolate up until we reach 0 
+            std::size_t parentIndex = (i - 1) / 2;            
+            if (less_(data_[i], data_[parentIndex])){        // Check if the value is less then its parent
+                std::swap(data_[parentIndex],data_[i]);      // If it is, swap the contents 
+                i = parentIndex;                             // Change index i 
+            }
+            else return;    // Return if parent is smaller then or equal to value                             
+        }
+    }
+
+    // Helper function that Sifts/Percolates Down 
+    void sift_down(std::size_t i){
+        while ( i < data_.size()){
+            std::size_t left = (2 * i) + 1;    // Left Child 
+            std::size_t right = (2 * i) + 2;   // Right Child 
+
+            // Assume candidate to swap with is the left child  
+            std::size_t candidate = left;
+           
+            // Check if left child exists
+            if(left >= data_.size()) return;        // If it doesn't exist return immediately
+        
+            // Check if right child exists and is less then left child 
+            if ((right < data_.size()) && (less_(data_[right],data_[left]))) candidate = right; // Make right child the candidate
+            // Check if the candidate is less then the parent
+            if(less_(data_[candidate],data_[i])){
+                std::swap(data_[candidate],data_[i]);   // Swap if it is less
+                i = candidate;                          // Update index so the siftdown can continue
+            }
+            else return;
+        }
+    }
+    
     std::vector<T> data_;
     Less           less_;
 };
